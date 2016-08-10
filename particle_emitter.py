@@ -1,30 +1,40 @@
 import gs
-import gs.plus.scene as scene
-import gs.plus.clock as clock
+
+import random
 
 life_span_sec = 2
 particles = None
 
+
 def create_particle(scn, nb):
 	global particles
 	particles = []
+	# particles don't collide to each other
+	scn.GetPhysicSystem().SetCollisionLayerPairState(4, 4, False)
+	scn.GetPhysicSystem().SetCollisionLayerPairState(0, 4, True)
+
 	for i in range(nb):
-		particles.append({"n": scene.add_physic_cube(scn, width=0.1, height=0.1, depth=0.1)[1], "life": 0})
+		node, rigid_body = gs.GetPlus().AddPhysicCube(scn, gs.Matrix4.Identity, 0.05, 0.05, 0.05)
+		# avoid the particle to collide to each other
+		rigid_body.SetCollisionLayer(4)
+		particles.append({"n": rigid_body, "life": 0})
 
 
-def update(start_pos, dir):
-	clock.update()
-
+def update(dt_sec, start_pos, dir):
 	# update particles and get the dead one
-	dead_particles = []
+	spawn_number = 0
 	for particle in particles:
-		particle["life"] -= clock.get_dt()
-		if particle["life"] <= 0:
-			dead_particles.append(particle)
+		particle["life"] -= dt_sec
+		if particle["life"] <= 0 and spawn_number < len(particles)*0.1 and random.random() < 0.01:
+			spawn_number += 1
+			particle["life"] = life_span_sec
+			rigid_body = particle["n"]
+			rigid_body.ResetWorld(gs.Matrix4.TransformationMatrix(start_pos, gs.Vector3(random.random(), random.random(), random.random())))
+			rigid_body.ApplyLinearImpulse(dir + gs.Vector3(random.random()*0.1, random.random()*0.1, random.random()*0.1))
 
-	for i in range(int(len(dead_particles) *0.1)):
-		dead_particles[i]["life"] = life_span_sec
-		rigid_body = dead_particles[i]["n"]
-		rigid_body.ResetWorld(gs.Matrix4.TranslationMatrix(start_pos))
-		rigid_body.ApplyLinearImpulse(dir)
 
+def deactivate_all_particles():
+	for particle in particles:
+		particle["life"] = 0
+		rigid_body = particle["n"]
+		rigid_body.ResetWorld(gs.Matrix4.TranslationMatrix(gs.Vector3(-100, -100, -100)))

@@ -1,5 +1,4 @@
 import gs
-import gs.plus.render as render
 import math
 
 
@@ -46,5 +45,5 @@ def create_surface(id, array):
 	geo.ComputeVertexNormal(math.radians(40))
 	geo.ComputeVertexTangent()
 
-	return render.create_geometry(geo), geo
+	return gs.GetPlus().CreateGeometry(geo), geo
 
