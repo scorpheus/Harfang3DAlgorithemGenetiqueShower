@@ -4,11 +4,11 @@ import random
 
 plus = gs.GetPlus()
 
-life_span_sec = 2
-spawn_rate = 1
-particles = None
-spawn_every_sec = 1.0/60
-spawn_timer = 0
+particle_count = 240
+particle_spawn_rate = 60 # per second
+particles = []
+# update particles life and spawn dead particles
+spawn_rate_control = 0
 
 
 def create_particle(scn, nb):
@@ -22,32 +22,33 @@ def create_particle(scn, nb):
 		node, rigid_body = gs.GetPlus().AddPhysicSphere(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, -100, 0)), 0.025)
 		# avoid the particle to collide to each other
 		rigid_body.SetCollisionLayer(1)
-		particles.append({"n": rigid_body, "life": 0})
+		particles.append([0, rigid_body])
 		plus.UpdateScene(scn, gs.time(1.0/60))
 
 
-def update(dt_sec, start_pos, dir):
-	global spawn_timer
+# update particles life and spawn dead particles
+def update_particles(dt_sec, start_pos, direction):
+	global particle_spawn_rate, spawn_rate_control
 	# update particles and get the dead one
-	spawn_number = 0
-	spawn_timer -= dt_sec
+	spawn_rate_control -= dt_sec
 	for particle in particles:
-		particle["life"] -= dt_sec
-		if spawn_timer <= 0:
-			if particle["life"] <= 0 and spawn_number < spawn_rate:
-				spawn_number += 1
-				particle["life"] = life_span_sec
-				rigid_body = particle["n"]
-				rigid_body.SetIsSleeping(False)
-				rigid_body.ResetWorld(gs.Matrix4.TransformationMatrix(start_pos, gs.Vector3(random.random(), random.random(), random.random())))
-				rigid_body.ApplyLinearImpulse(dir + gs.Vector3(random.random()*0.1, random.random()*0.1, random.random()*0.1))
+		if particle[0] > 0:
+			particle[0] -= dt_sec # update life
+		elif spawn_rate_control < 0:
+			spawn_rate_control += 1.0 / particle_spawn_rate
+			particle[0] = particle_count / particle_spawn_rate
 
-	if spawn_timer <= 0:
-		spawn_timer = spawn_every_sec
-
+			# when teleport the particle rigid body to its spawn position, wake up the rigidbody and reset its world matrix
+			rigid_body = particle[1]
+			rigid_body.SetIsSleeping(False)
+			rigid_body.ResetWorld(gs.Matrix4.TransformationMatrix(start_pos, gs.Vector3(random.random(), random.random(), random.random())))
+			rigid_body.ApplyLinearImpulse(direction + gs.Vector3(random.random()*0.1, random.random()*0.1, random.random()*0.1))
+			
 
 def deactivate_all_particles():
+	global spawn_rate_control
+	spawn_rate_control = 0
 	for particle in particles:
-		particle["life"] = 0
-		rigid_body = particle["n"]
+		particle[0] = 0
+		rigid_body = particle[1]
 		rigid_body.ResetWorld(gs.Matrix4.TranslationMatrix(gs.Vector3(-100, -100, -100)))

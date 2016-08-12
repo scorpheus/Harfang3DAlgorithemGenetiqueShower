@@ -64,7 +64,7 @@ while not plus.IsAppEnded(plus.EscapePressed | plus.WindowClosed):
 
 	fps.UpdateAndApplyToNode(cam, dt_sec)
 
-	particle_emitter.update(fixed_timestep, gs.Vector3(2.5, 3, -1), gs.Vector3(-1, 2, 3))
+	particle_emitter.update_particles(fixed_timestep, gs.Vector3(2.5, 3, -1), gs.Vector3(-1, 2, 3))
 
 	# test
 	# if test timer is under 0, take the next to test
