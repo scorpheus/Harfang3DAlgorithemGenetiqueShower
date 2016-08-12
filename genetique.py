@@ -1,9 +1,10 @@
 import numpy as np
 import random
 import os
+import gs
 
 current_generation = 0
-nb_test_subject = 10
+nb_test_subject = 50
 test_subjects = []
 
 
@@ -16,11 +17,15 @@ def create_initial_test_subject(width, height):
 	else:
 		for i in range(nb_test_subject):
 			# test_subjects.append({"a": np.random.rand(width * height), "score": 0})
-			test_subjects.append({"a": np.zeros(width * height), "score": 0})
+			array = np.empty(width * height)
+			array.fill(0.5)
+			test_subjects.append({"a": array, "score": 0})
 
 
 def make_new_generation():
 	global test_subjects
+
+	random.seed(gs.time.now_ms())
 
 	# save the generation
 	generation_to_save = {str(i):v["a"] for i, v in enumerate(test_subjects)}
@@ -44,10 +49,10 @@ def make_new_generation():
 				rand2 = random.random()
 				# 50% from parent A + rand
 				if rand2 < 0.5:
-					array[j] = subject_a[j] + random.random() *0.05
+					array[j] = subject_a[j] + (random.random()-0.5) *0.05
 				# 5% from parent B + rand
 				else:
-					array[j] = subject_b[j] + random.random() *0.05
+					array[j] = subject_b[j] + (random.random()-0.5) *0.05
 			# mix from the 2 parent
 			else:
 				rand2 = random.random()

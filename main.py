@@ -1,5 +1,4 @@
-import gs
-
+import random
 import particle_emitter
 from create_surface import *
 import genetique
@@ -40,7 +39,7 @@ def add_physic_geo(scn, geo, core_geo, mat=gs.Matrix4.Identity, mass=0, material
 # create the random plane
 surface = None
 
-#initialize subject
+# initialize subject
 width, height = 50, 50
 genetique.create_initial_test_subject(width, height)
 
@@ -60,7 +59,7 @@ score = 0.0
 fixed_timestep = 1.0/60
 best_score = 0
 
-while not plus.KeyPress(gs.InputDevice.KeyEscape) and plus.GetRendererAsync().GetDefaultOutputWindow().IsOpen():
+while not plus.IsAppEnded(plus.EscapePressed | plus.WindowClosed):
 	dt_sec = plus.UpdateClock()
 
 	fps.UpdateAndApplyToNode(cam, dt_sec)
@@ -70,6 +69,7 @@ while not plus.KeyPress(gs.InputDevice.KeyEscape) and plus.GetRendererAsync().Ge
 	# test
 	# if test timer is under 0, take the next to test
 	if test_timer < 0:
+		random.seed(4)
 		genetique.test_subjects[current_index_tested]["score"] = score
 		print("change subject, score {0}, {1} id, {2} test_subjects".format(score, str(current_index_tested + genetique.nb_test_subject*(genetique.current_generation+1)), genetique.current_generation))
 
@@ -86,8 +86,8 @@ while not plus.KeyPress(gs.InputDevice.KeyEscape) and plus.GetRendererAsync().Ge
 		# remove the geometry and add the new one to test
 		scn.RemoveNode(surface)
 
-		core_geo = plus.CreateGeometryFromHeightmap(width, height, genetique.test_subjects[current_index_tested]["a"].tolist(), 4.0, None, str(current_index_tested + genetique.nb_test_subject * (genetique.current_generation + 1)))
-		surface, core_surface = add_physic_geo(scn, gs.GetPlus().CreateGeometry(core_geo, False), core_geo)
+		core_geo = plus.CreateGeometryFromHeightmap(width, height, genetique.test_subjects[current_index_tested]["a"].tolist(), 1.0, None, str(current_index_tested + genetique.nb_test_subject * (genetique.current_generation + 1)))
+		surface, core_surface = add_physic_geo(scn, gs.GetPlus().CreateGeometry(core_geo, False), core_geo, gs.Matrix4.TranslationMatrix((1.5, 2, 0)))
 	else:
 		# count the number of particle colliding
 		test_timer -= fixed_timestep

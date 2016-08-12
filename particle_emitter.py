@@ -19,10 +19,11 @@ def create_particle(scn, nb):
 	scn.GetPhysicSystem().SetCollisionLayerPairState(0, 1, True)
 
 	for i in range(nb):
-		node, rigid_body = gs.GetPlus().AddPhysicCube(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, -100, 0)), 0.05, 0.05, 0.05)
+		node, rigid_body = gs.GetPlus().AddPhysicSphere(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, -100, 0)), 0.025)
 		# avoid the particle to collide to each other
 		rigid_body.SetCollisionLayer(1)
 		particles.append({"n": rigid_body, "life": 0})
+		plus.UpdateScene(scn, gs.time(1.0/60))
 
 
 def update(dt_sec, start_pos, dir):
