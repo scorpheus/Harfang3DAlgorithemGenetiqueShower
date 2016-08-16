@@ -13,7 +13,6 @@ plus.RenderInit(1024, 768)
 plus.GetRendererAsync().SetVSync(False)
 
 scn = plus.NewScene()
-scn.GetPhysicSystem().SetTimestep(1.0/120)
 # scn.GetPhysicSystem().SetDebugVisuals(True)
 
 cam = plus.AddCamera(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, 1, -10)))
@@ -46,10 +45,16 @@ genetique.create_initial_test_subject(width, height)
 # create the plane to evaluate score
 plane, rb_plane = plus.AddPhysicPlane(scn, gs.Matrix4.TransformationMatrix(gs.Vector3(2, 1, -1), gs.Vector3(0.75, 0, 0)), 1, 1)
 
+while plane.GetComponent("BoxCollision") == None:
+	plus.UpdateScene(scn, gs.time(1.0/60))
+plane.GetComponent("BoxCollision").SetDimensions(gs.Vector3(1, 0.1, 1))
+plane.GetComponent("BoxCollision").SetMatrix(gs.Matrix4.TranslationMatrix(gs.Vector3(0, -0.05, 0)))
+
 # initialize particles
 particle_emitter.create_particle(scn, 200)
 
 fps = gs.FPSController(0, 2, -10)
+scn.GetPhysicSystem().SetTimestep(1.0/120)
 
 # parameters
 current_index_tested = 0
@@ -59,8 +64,9 @@ score = 0.0
 fixed_timestep = 1.0/60
 best_score = 0
 
-while not plus.IsAppEnded(plus.EscapePressed | plus.WindowClosed):
+while not plus.IsAppEnded(plus.EndOnEscapePressed | plus.EndOnDefaultWindowClosed):
 	dt_sec = plus.UpdateClock()
+	# fixed_timestep = dt_sec.to_sec()
 
 	fps.UpdateAndApplyToNode(cam, dt_sec)
 
@@ -71,7 +77,7 @@ while not plus.IsAppEnded(plus.EscapePressed | plus.WindowClosed):
 	if test_timer < 0:
 		random.seed(4)
 		genetique.test_subjects[current_index_tested]["score"] = score
-		print("change subject, score {0}, {1} id, {2} test_subjects".format(score, str(current_index_tested + genetique.nb_test_subject*(genetique.current_generation+1)), genetique.current_generation))
+		print("change subject, score {0}, {1} id, {2} test_subjects, best score: {3}".format(score, str(current_index_tested + genetique.nb_test_subject*(genetique.current_generation+1)), genetique.current_generation, best_score))
 
 		test_timer = duration_test
 		score = 0.0
@@ -86,8 +92,8 @@ while not plus.IsAppEnded(plus.EscapePressed | plus.WindowClosed):
 		# remove the geometry and add the new one to test
 		scn.RemoveNode(surface)
 
-		core_geo = plus.CreateGeometryFromHeightmap(width, height, genetique.test_subjects[current_index_tested]["a"].tolist(), 1.0, None, str(current_index_tested + genetique.nb_test_subject * (genetique.current_generation + 1)))
-		surface, core_surface = add_physic_geo(scn, gs.GetPlus().CreateGeometry(core_geo, False), core_geo, gs.Matrix4.TranslationMatrix((1.5, 2, 0)))
+		core_geo = plus.CreateGeometryFromHeightmap(width, height, genetique.test_subjects[current_index_tested]["a"].tolist(), 0.5, None, str(current_index_tested + genetique.nb_test_subject * (genetique.current_generation + 1)))
+		surface, core_surface = add_physic_geo(scn, gs.GetPlus().CreateGeometry(core_geo, False), core_geo, gs.Matrix4.TranslationMatrix((1.75, 2.5, 0)))
 	else:
 		# count the number of particle colliding
 		test_timer -= fixed_timestep

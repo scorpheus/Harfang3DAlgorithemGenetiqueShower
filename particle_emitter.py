@@ -43,7 +43,7 @@ def update_particles(dt_sec, start_pos, direction):
 			rigid_body.SetIsSleeping(False)
 			rigid_body.ResetWorld(gs.Matrix4.TransformationMatrix(start_pos, gs.Vector3(random.random(), random.random(), random.random())))
 			rigid_body.ApplyLinearImpulse(direction + gs.Vector3(random.random()*0.1, random.random()*0.1, random.random()*0.1))
-			
+
 
 def deactivate_all_particles():
 	global spawn_rate_control

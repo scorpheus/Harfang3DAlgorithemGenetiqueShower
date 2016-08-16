@@ -4,7 +4,7 @@ import os
 import gs
 
 current_generation = 0
-nb_test_subject = 50
+nb_test_subject = 25
 test_subjects = []
 
 
@@ -25,7 +25,7 @@ def create_initial_test_subject(width, height):
 def make_new_generation():
 	global test_subjects
 
-	random.seed(gs.time.now_ms())
+	random.seed(gs.time.now_us())
 
 	# save the generation
 	generation_to_save = {str(i):v["a"] for i, v in enumerate(test_subjects)}
@@ -41,8 +41,16 @@ def make_new_generation():
 	test_subjects = []
 
 	for i in range(nb_test_subject):
-		array = np.zeros(subject_a.shape)
+		array = np.empty(subject_a.shape)
+		array.fill(0.5)
 		for j in range(array.shape[0]):
+			# # if there is no code, maybe mutate a bit
+			# if subject_a[j] == 0.5 or subject_b[j] == 0.5:
+			# 	rand = random.random()
+			# 	# .001% mutation
+			# 	if rand < 0.001:
+			# 		array[j] += (random.random()-0.5) *0.05
+			# else:
 			rand = random.random()
 			# .01% mutation
 			if rand < 0.001:
