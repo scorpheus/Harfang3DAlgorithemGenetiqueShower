@@ -4,7 +4,7 @@ import os
 import gs
 
 current_generation = 0
-nb_test_subject = 25
+nb_test_subject = 50
 test_subjects = []
 
 
@@ -12,8 +12,16 @@ def create_initial_test_subject(width, height):
 	global test_subjects
 	if os.path.exists("generations_saved.npz"):
 		npzfile = np.load("generations_saved.npz")
-		for i in range(nb_test_subject):
+		for i in range(len(npzfile.files)):
 			test_subjects.append({"a": npzfile[str(i)], "score": 0})
+
+		if len(test_subjects) < nb_test_subject:
+			for i in range(nb_test_subject - len(test_subjects)):
+				# test_subjects.append({"a": np.random.rand(width * height), "score": 0})
+				array = np.empty(width * height)
+				array.fill(0.5)
+				test_subjects.append({"a": array, "score": 0})
+
 	else:
 		for i in range(nb_test_subject):
 			# test_subjects.append({"a": np.random.rand(width * height), "score": 0})
@@ -25,7 +33,9 @@ def create_initial_test_subject(width, height):
 def make_new_generation():
 	global test_subjects
 
-	random.seed(gs.time.now_us())
+	nb_best_subject = 10
+
+	random.seed(current_generation)
 
 	# save the generation
 	generation_to_save = {str(i):v["a"] for i, v in enumerate(test_subjects)}
@@ -33,15 +43,16 @@ def make_new_generation():
 
 	sorted_subjects = sorted(test_subjects, key=lambda k: k['score'])[::-1]
 
-	# get the 2 most scored subject
-	subject_a = sorted_subjects[0]["a"]
-	subject_b = sorted_subjects[1]["a"]
-
 	# create next generations
 	test_subjects = []
 
+	# keep the best subject
+	# for i in range(nb_best_subject):
+	# 	test_subjects.append({"a": sorted_subjects[i]["a"], "score": 0})
+
 	for i in range(nb_test_subject):
-		array = np.empty(subject_a.shape)
+		random.seed(current_generation * nb_test_subject + i )
+		array = np.empty(sorted_subjects[0]["a"].shape)
 		array.fill(0.5)
 		for j in range(array.shape[0]):
 			# # if there is no code, maybe mutate a bit
@@ -55,21 +66,15 @@ def make_new_generation():
 			# .01% mutation
 			if rand < 0.001:
 				rand2 = random.random()
-				# 50% from parent A + rand
-				if rand2 < 0.5:
-					array[j] = subject_a[j] + (random.random()-0.5) *0.05
-				# 5% from parent B + rand
-				else:
-					array[j] = subject_b[j] + (random.random()-0.5) *0.05
+				id_parent = int(rand2 * nb_best_subject)
+				# mutate a bit from the parent
+				array[j] = sorted_subjects[id_parent]["a"][j] + (random.random()-0.5) *0.05
 			# mix from the 2 parent
 			else:
 				rand2 = random.random()
-				# 50% from parent A
-				if rand2 < 0.5:
-					array[j] = subject_a[j]
-				# 5% from parent B
-				else:
-					array[j] = subject_b[j]
+				id_parent = int(rand2 * nb_best_subject)
+				# copy the parent gene
+				array[j] = sorted_subjects[id_parent]["a"][j]
 
 			# # .01% mutation
 			# # if rand < 0.001:

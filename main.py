@@ -75,7 +75,6 @@ while not plus.IsAppEnded(plus.EndOnEscapePressed | plus.EndOnDefaultWindowClose
 	# test
 	# if test timer is under 0, take the next to test
 	if test_timer < 0:
-		random.seed(4)
 		genetique.test_subjects[current_index_tested]["score"] = score
 		print("change subject, score {0}, {1} id, {2} test_subjects, best score: {3}".format(score, str(current_index_tested + genetique.nb_test_subject*(genetique.current_generation+1)), genetique.current_generation, best_score))
 
@@ -92,8 +91,10 @@ while not plus.IsAppEnded(plus.EndOnEscapePressed | plus.EndOnDefaultWindowClose
 		# remove the geometry and add the new one to test
 		scn.RemoveNode(surface)
 
-		core_geo = plus.CreateGeometryFromHeightmap(width, height, genetique.test_subjects[current_index_tested]["a"].tolist(), 0.5, None, str(current_index_tested + genetique.nb_test_subject * (genetique.current_generation + 1)))
-		surface, core_surface = add_physic_geo(scn, gs.GetPlus().CreateGeometry(core_geo, False), core_geo, gs.Matrix4.TranslationMatrix((1.75, 2.5, 0)))
+		core_geo = plus.CreateGeometryFromHeightmap(width, height, genetique.test_subjects[current_index_tested]["a"].tolist(), 0.25, None, str(current_index_tested + genetique.nb_test_subject * (genetique.current_generation + 1)))
+		surface, core_surface = add_physic_geo(scn, gs.GetPlus().CreateGeometry(core_geo, False), core_geo, gs.Matrix4.TranslationMatrix((1.9, 2.65, 0)))
+
+		random.seed(4)
 	else:
 		# count the number of particle colliding
 		test_timer -= fixed_timestep

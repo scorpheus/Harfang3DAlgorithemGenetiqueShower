@@ -12,13 +12,14 @@ spawn_rate_control = 0
 
 
 def create_particle(scn, nb):
-	global particles
+	global particles, particle_count
+	particle_count = nb
 	particles = []
 	# particles don't collide to each other
 	scn.GetPhysicSystem().SetCollisionLayerPairState(1, 1, False)
 	scn.GetPhysicSystem().SetCollisionLayerPairState(0, 1, True)
 
-	for i in range(nb):
+	for i in range(particle_count):
 		node, rigid_body = gs.GetPlus().AddPhysicSphere(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, -100, 0)), 0.025)
 		# avoid the particle to collide to each other
 		rigid_body.SetCollisionLayer(1)
