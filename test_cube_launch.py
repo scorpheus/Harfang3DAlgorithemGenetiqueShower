@@ -31,7 +31,7 @@ def initialize_environment(scn):
 def initiate_test_subject(scn, array_gen):
 	rb_cube.SetIsSleeping(False)
 	rb_cube.ResetWorld(gs.Matrix4.TranslationMatrix(gs.Vector3(0, 1, 0)))
-	rb_cube.ApplyLinearImpulse(gs.Vector3(array_gen[0], array_gen[1], array_gen[2])*10)
+	rb_cube.ApplyLinearImpulse(gs.Vector3(array_gen[0], array_gen[1]*4, array_gen[2])*3)
 
 	random.seed(4)
 
