@@ -2,8 +2,9 @@ import random
 from create_surface import *
 import genetique
 # import test_cube_launch as experiment
-import test_shower as experiment
+# import test_shower as experiment
 # import test_shower_iso as experiment
+import test_car as experiment
 
 gs.LoadPlugins()
 
@@ -15,11 +16,11 @@ plus.RenderInit(1024, 768)
 plus.GetRendererAsync().SetVSync(False)
 
 scn = plus.NewScene()
-# scn.GetPhysicSystem().SetDebugVisuals(True)
+scn.GetPhysicSystem().SetDebugVisuals(True)
 
 cam = plus.AddCamera(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, 1, -10)))
-plus.AddLight(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(6, 4, -6)))
-plus.AddLight(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(-8, 4, -6)))
+plus.AddLight(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(6, 10, -6)))
+plus.AddLight(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(-8, 10, -6)))
 
 # initialize subject
 genetique.create_initial_test_subject(experiment.get_name(), experiment.get_gen_count())
@@ -38,7 +39,7 @@ fixed_timestep = 1.0/60
 best_score = -10000
 
 
-show_the_best = True
+show_the_best = False
 if show_the_best:
 	array_gen = genetique.load_best(experiment.get_name())
 
@@ -47,11 +48,12 @@ if not show_the_best or array_gen is None:
 
 experiment.initiate_test_subject(scn, array_gen)
 
-while not plus.IsAppEnded(plus.EndOnEscapePressed | plus.EndOnDefaultWindowClosed):
+while not plus.IsAppEnded(plus.EndOnDefaultWindowClosed): #plus.EndOnEscapePressed |
 	dt_sec = plus.UpdateClock()
 
 	if show_the_best:
 		fixed_timestep = dt_sec.to_sec()
+	# fixed_timestep = dt_sec.to_sec()
 
 	fps.UpdateAndApplyToNode(cam, dt_sec)
 
@@ -78,6 +80,9 @@ while not plus.IsAppEnded(plus.EndOnEscapePressed | plus.EndOnDefaultWindowClose
 			array_gen = genetique.test_subjects[current_index_tested]["a"]
 
 			experiment.initiate_test_subject(scn, array_gen)
+
+			plus.UpdateScene(scn, gs.time(fixed_timestep))
+			plus.UpdateScene(scn, gs.time(fixed_timestep))
 		else:
 			# count the number of particle colliding
 			test_timer -= fixed_timestep

@@ -16,17 +16,17 @@ def create_initial_test_subject(name, gen_count):
 
 		if len(test_subjects) < nb_test_subject:
 			for i in range(nb_test_subject - len(test_subjects)):
-				# test_subjects.append({"a": np.random.rand(width * height), "score": 0})
-				array = np.empty(gen_count)
-				array.fill(0.5)
-				test_subjects.append({"a": array, "score": 0})
+				test_subjects.append({"a": 2*np.random.random(gen_count) - 1, "score": 0})
+				# array = np.empty(gen_count)
+				# array.fill(0.5)
+				# test_subjects.append({"a": array, "score": 0})
 
 	else:
 		for i in range(nb_test_subject):
-			# test_subjects.append({"a": np.random.rand(width * height), "score": 0})
-			array = np.empty(gen_count)
-			array.fill(0.5)
-			test_subjects.append({"a": array, "score": 0})
+			test_subjects.append({"a": 2*np.random.random(gen_count) - 1, "score": 0})
+			# array = np.empty(gen_count)
+			# array.fill(0.5)
+			# test_subjects.append({"a": array, "score": 0})
 
 
 def save_best_subject(old_best_score, name):
